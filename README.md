@@ -1,37 +1,110 @@
-# Layer-Adaptive Quantization on Diffusion Model using Fisher Information
+# Layer-Adaptive Quantization on Diffusion Model using Fisher Information (LAQFI)
+This repository contains the official implementation of Layer-Adaptive Quantization for U-Net-based Diffusion Models, guided by Fisher Information. We propose a method that selectively quantizes model layers based on their relative contribution to image generation quality, achieving up to 49.4% model size reduction while improving FID by up to 7% compared to uniform quantization.
 
-## 전체 코드 파일 개요
-- `simplediffusion.py`
-  - ddpm 모델 구현 및 훈련
-  - generated image 생성
-  - 생성된 이미지 저장
-  - FID score 및 메모리 계산
-  - Fisher Information 값 계산
-  - **대조군** (원본 모델, 전체 양자화) 모델 FID 및 메모리 측정
-### 실험군 
-- `whole_threshold.py`: 전체 임계값 설정 후 양자화, FID 및 메모리 측정
-- `layer_group.py`: layer 그룹별 임계값 설정 후 양자화, FID 및 메모리 측정
-- `layer_ratio.py`: layer별 임계값 비율 설정 후 양자화, FID 및 메모리 측정
-- `layer_math.py`: layer별 평균 분산 적응형 계수 임계값 설정 후 양자화, FID 및 메모리 측정
+## Table of Contents
+1. [Overview](#overview)
+2. [Key Contributions](#key-contributions)
+3. [Repository Structure](#repository-structure)
+4. [Setup & Execution](#setup--execution)
+5. [Methodology](#methodology)
+6. [Experimental Results](#experimental-results)
+7. [Authors](#authors)
 
 
-## 코드 실행 순서 및 방법
+## Overview
+Diffusion Models deliver high-quality image generation but require heavy memory and slow computation due to full-precision parameters. Traditional quantization reduces memory but often degrades image quality by treating all layers equally.
 
-### 환경 세팅
-1. 서버 접속 <br>
-   서버 계정 정보는 메일을 통해 공유드렸습니다!
+This project introduces:
+Layer-importance-aware quantization using Fisher Information, selectively applying precision reduction where it least affects performance.
 
-2. 디렉토리 이동: `cd LAQFI`
-   
-3. conda 가상환경 설정
-  - conda 가상 환경 생성: `conda env create -f env.yml`
-  - conda 가상 환경 활성화: `conda activate sd_env`
+Evaluated on DDPM with MNIST dataset.
 
-### 실험 시작
-1. `simplediffusion.py` 실행
-2. 양자화 실험 <br>
-  - 단일 임곗값 설정 실험: `python3 whole_threshold.py`
-  - 레이어  그룹별 임곗값 설정 실험: `python3 layer_ratio.py`
-  - 레이어별 임곗값 설정 실험
-    - layer 별 임계값 비율 설정: `python3 layer_group.py`
-    - layer별 평균 분산 적응형 계수 임계값 설정: `python3 layer_math.py`
+## Key Contributions
+- Fisher Information–based analysis of U-Net layer significance
+- Three differential quantization strategies:
+  - Global threshold
+  - Layer-group adaptive threshold
+  - Fully layer-wise adaptive threshold
+- Demonstrated both model compression and performance gains
+- Fully reproducible pipeline: Fisher computation → Quantization → FID evaluation
+
+## Repository Structure
+```graphql
+LAQFI/
+│
+├── simplediffusion.py   # Train baseline DDPM + generate images + compute Fisher + FID + memory
+│
+├── whole_threshold.py   # Global threshold quantization
+├── layer_group.py       # Group-based thresholds (e.g., Layer 1&2 vs 3–6)
+├── layer_ratio.py       # Layer-wise thresholds using percentile ratio
+├── layer_math.py        # Layer-wise thresholds using mean/variance + scaling
+│
+├── env.yml              # Conda environment file
+└── README.md
+
+```
+
+## Setup & Execution
+### 1. Create & Activate Environment
+```bash
+git clone https://github.com/<USER>/LAQFI.git
+cd LAQFI
+
+conda env create -f env.yml
+conda activate sd_env
+```
+
+### 2. Train Baseline & Compute Fisher Information
+```bash
+python3 simplediffusion.py
+```
+This will:
+- Train DDPM on MNIST dataset
+- Generate evaluation images
+- Compute Fisher Information for layer importance
+- Measure baseline FID & model size
+
+### 3. Run Quantization Experiments
+| Experiment                              | Run Command                  |
+| --------------------------------------- | ---------------------------- |
+| Global threshold                        | `python3 whole_threshold.py` |
+| Layer-group thresholds                  | `python3 layer_group.py`     |
+| Percentile-based layer-wise thresholds  | `python3 layer_ratio.py`     |
+| Mean/variance-based adaptive thresholds | `python3 layer_math.py`      |
+
+Each experiment performs: <br>
+Quantization → Sampling → FID evaluation → Memory measurement
+
+
+## Methodology
+- Compute layer-wise Fisher Information → Estimate importance of each U-Net layer to final image quality
+- Set threshold rules per strategy
+- Quantize only weights below threshold
+- Measure compression & FID change
+- Fisher trend insights:
+  - Decoder-side (later timesteps) layers more influential
+  - Layers 1–2 show notably higher Fisher values ⇒ Protected from aggressive quantization
+
+## Experimental Results
+| Model                   | FID ↓     | Size (MB) ↓ | Reduction % ↑ |
+| ----------------------- | --------- | ----------- | ------------- |
+| Baseline (FP32)         | 22.7512   | 134.2       | –             |
+| Uniform Quantization    | 24.1324   | 67.7        | 49.55%        |
+| Layer-Group (12 / 3456) | ~23.84    | **67.9**    | **49.4%**     |
+| Ratio p = 0.25          | **22.42** | 102.26      | 23.8%         |
+| Math-Based Layer Wise   | 23.16     | 81.57       | 39.2%         |
+
+- Best Balance: Layer-Group Strategy
+- Best FID: Layer-wise Ratio p=0.25 (≈ +7% improvement over uniform quantization)
+
+ 
+## Authors
+👩‍💻 Authors
+
+- Doeun Kim (Co-first Author) — [doeunkim.cs@gmail.com](mailto:doeunkim.cs@gmail.com)
+- Jieun Byeon (Co-first Author)
+- Inae Park (Co-first Author)
+- Jaehyeong Sim (Advisor)
+
+Department of Computer Science and Engineering <br>
+Ewha Womans University
