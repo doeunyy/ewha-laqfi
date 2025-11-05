@@ -1,7 +1,7 @@
 # Layer-Adaptive Quantization on Diffusion Model using Fisher Information (LAQFI)
 This repository contains the official implementation of Layer-Adaptive Quantization for U-Net-based Diffusion Models, guided by Fisher Information. We propose a method that selectively quantizes model layers based on their relative contribution to image generation quality, achieving up to 49.4% model size reduction while improving FID by up to 7% compared to uniform quantization.
 
-[📄 Download Poster (PDF)](https://github.com/Ewha-DoInJi/LAQFI/blob/main/LAQFI_poster_eng.pdf)
+[📄 Download Poster (PDF)](https://github.com/doeunyy/ewha-laqfi/blob/main/LAQFI_poster_eng.pdf)
 
 ## Table of Contents
 1. [Overview](#overview)
