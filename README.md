@@ -101,7 +101,6 @@ Quantization → Sampling → FID evaluation → Memory measurement
 
  
 ## Authors
-👩‍💻 Authors
 
 - Doeun Kim (Co-first Author) — [doeunkim.cs@gmail.com](mailto:doeunkim.cs@gmail.com)
 - Jieun Byeon (Co-first Author)
