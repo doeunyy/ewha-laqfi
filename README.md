@@ -1,12 +1,18 @@
 # Layer-Adaptive Quantization on Diffusion Model using Fisher Information (LAQFI)
 
-> **TL;DR**
+> ### **TL;DR**
 > - Proposed **layer-adaptive quantization** for diffusion models using **Fisher Information**
 > - Identified layer importance in U-Net–based DDPMs to guide selective precision reduction
 > - Achieved **49.4% model size reduction** while **improving FID by up to 7%** over uniform quantization
 > - Presented as a poster at the **2024 IEIE Symposium**
 
-This repository contains the official implementation of Layer-Adaptive Quantization for U-Net-based Diffusion Models, guided by Fisher Information. We propose a method that selectively quantizes model layers based on their relative contribution to image generation quality, achieving up to 49.4% model size reduction while improving FID by up to 7% compared to uniform quantization.
+<br>
+
+This repository presents a research-driven approach to **efficient diffusion model compression** by examining layer-wise sensitivity in U-Net–based architectures.
+Instead of applying uniform precision reduction, this work leverages **Fisher Information** to estimate each layer’s relative contribution to image generation quality and uses this signal to guide selective quantization.
+
+By explicitly modeling layer importance, the project demonstrates how principled, information-theoretic analysis can enable both **model efficiency and generative quality preservation** in diffusion models.
+
 
 [📄 Download Poster (PDF)](https://github.com/doeunyy/ewha-laqfi/blob/main/LAQFI_poster_eng.pdf)
 
